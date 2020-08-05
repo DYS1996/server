@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 func main() {
@@ -27,7 +28,9 @@ func main() {
 		Handler: handler.New(db),
 	}
 
-	if err := srv.ListenAndServeTLS(filepath.Join(dir, "./ssl.crt"), filepath.Join(dir, "./ssl.key")); err != nil {
+	crt := autocert.NewListener("api.redhand.vip")
+
+	if err := srv.Listen(crt); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("setup server: %v\n", err)
 	}
 }
